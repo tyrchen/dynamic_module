@@ -6,7 +6,7 @@ defmodule DynamicModule.MixProject do
 
   def project do
     [
-      app: :dynamic_module,
+      app: :dynamic_module_new,
       version: @version,
       elixir: @elixir_version,
       description: description(),
@@ -17,8 +17,8 @@ defmodule DynamicModule.MixProject do
 
       # Docs
       name: "DynamicModule",
-      source_url: "https://github.com/ArcBlock/dynamic_module",
-      homepage_url: "https://github.com/ArcBlock/dynamic_module",
+      source_url: "https://github.com/tyrchen/dynamic_module",
+      homepage_url: "https://github.com/tyrchen/dynamic_module",
       docs: [
         main: "DynamicModule",
         extras: ["README.md"]
@@ -60,8 +60,8 @@ defmodule DynamicModule.MixProject do
       licenses: ["MIT"],
       maintainers: ["tyr.chen@gmail.com"],
       links: %{
-        "GitHub" => "https://github.com/ArcBlock/dynamic_module",
-        "Docs" => "https://hexdocs.pm/dynamic_module"
+        "GitHub" => "https://github.com/tyrchen/dynamic_module",
+        "Docs" => "https://hexdocs.pm/dynamic_module_new"
       }
     ]
   end

@@ -10,7 +10,7 @@ by adding `dynamic_module` to your list of dependencies in `mix.exs`:
 ```elixir
 def deps do
   [
-    {:dynamic_module, "~> 0.1.0"}
+    {:dynamic_module_new, "~> 0.1"}
   ]
 end
 ```

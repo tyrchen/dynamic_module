@@ -14,6 +14,7 @@ defmodule DynamicModule do
 
     * `:doc` - the documents to the module. Defaults to `false`
     * `:path` - the path for generated `.ex` files. Defaults to `""`
+    * `:ext` - the extension of generated file. Defaults to `ex`
     * `:create` - a boolean value indicates whether to create `.beam` file. Defaults to `true`
   """
   defmacro gen(mod_name, preamble, contents, opts \\ []) do
@@ -25,6 +26,7 @@ defmodule DynamicModule do
           ] do
       mod_doc = Keyword.get(opts, :doc, false)
       path = Keyword.get(opts, :path, "")
+      ext = Keyword.get(opts, :ext, "ex")
       create? = Keyword.get(opts, :create, true)
       format? = Keyword.get(opts, :format, true)
       output? = Keyword.get(opts, :output, true)
@@ -44,58 +46,68 @@ defmodule DynamicModule do
         )
       end
 
-      case File.mkdir_p(path) do
-        {:error, :enoent} ->
-          [:cyan, "Module [#{mod_name}] is generated."]
-          |> IO.ANSI.format()
-          |> IO.puts()
-
-        :ok ->
-          filename = Path.join(path, "#{mod_name}.ex")
-
-          term =
-            if is_list(contents) do
-              quote do
-                defmodule unquote(name) do
-                  unquote(moduledoc)
-                  unquote(preamble)
-                  unquote_splicing(contents)
-                end
-              end
-            else
-              quote do
-                defmodule unquote(name) do
-                  unquote(moduledoc)
-                  unquote(preamble)
-                  unquote(contents)
-                end
-              end
-            end
-
-          term =
-            term
-            |> Macro.to_string()
-            |> String.replace(~r/(\(\s|\s\))/, "")
-            |> String.replace(
-              ~r/(def|defp|defmodule|create|create_if_not_exists|get|post|patch|delete|object|enum|schema)\((.*?)\) do/,
-              "\\1 \\2 do"
-            )
-            |> String.replace(
-              ~r/(alias|require|import|pipe|use|plug|forward|field|has_one|has_many|add|timestamps|drop|drop_if_exists)\((.*?)\)\n/,
-              "\\1 \\2\n"
-            )
-
-          File.write!(filename, term)
-
-          if format? do
-            Mix.Tasks.Format.run([filename])
-          end
-
-          if output? do
-            [:cyan, "Module [#{mod_name}] is generated. File created at #{filename}."]
+      if path != "" do
+        case File.mkdir_p(path) do
+          {:error, :enoent} ->
+            [:red, "Failed to create #{path}."]
             |> IO.ANSI.format()
             |> IO.puts()
-          end
+
+          :ok ->
+            filename = Path.join(path, "#{mod_name}.#{ext}")
+
+            term =
+              if is_list(contents) do
+                quote do
+                  defmodule unquote(name) do
+                    unquote(moduledoc)
+                    unquote(preamble)
+                    unquote_splicing(contents)
+                  end
+                end
+              else
+                quote do
+                  defmodule unquote(name) do
+                    unquote(moduledoc)
+                    unquote(preamble)
+                    unquote(contents)
+                  end
+                end
+              end
+
+            term =
+              term
+              |> Macro.to_string()
+              |> String.replace(~r/(\(\s|\s\))/, "")
+              |> String.replace(
+                ~r/(def|defp|defmodule|create|create_if_not_exists|get|post|patch|delete|object|enum|schema)\((.*?)\) do/,
+                "\\1 \\2 do"
+              )
+              |> String.replace(
+                ~r/(alias|require|import|pipe|use|plug|forward|field|has_one|has_many|add|timestamps|drop|drop_if_exists)\((.*?)\)\n/,
+                "\\1 \\2\n"
+              )
+
+            File.write!(filename, term)
+
+            if format? do
+              Mix.Tasks.Format.run([filename])
+            end
+
+            if output? do
+              [
+                "Module",
+                :cyan,
+                " #{mod_name} ",
+                :reset,
+                "is generated. File created at ",
+                :cyan,
+                "#{filename}."
+              ]
+              |> IO.ANSI.format()
+              |> IO.puts()
+            end
+        end
       end
     end
   end
