@@ -24,14 +24,6 @@ test:
 	@echo "Running test suites..."
 	@mix test
 
-travis-init:
-	@echo "Initialize software required for travis (normally ubuntu software)"
-
-travis: dep test
-
-travis-deploy: release
-	@echo "Deploy the software by travis"
-
 include .makefiles/*.mk
 
 .PHONY: test

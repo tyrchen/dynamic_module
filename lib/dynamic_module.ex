@@ -24,6 +24,7 @@ defmodule DynamicModule do
             contents: contents,
             opts: opts
           ] do
+      alias Mix.Tasks.Format
       mod_doc = Keyword.get(opts, :doc, false)
       path = Keyword.get(opts, :path, "")
       ext = Keyword.get(opts, :ext, "ex")
@@ -91,7 +92,7 @@ defmodule DynamicModule do
             File.write!(filename, term)
 
             if format? do
-              Mix.Tasks.Format.run([filename])
+              Format.run([filename])
             end
 
             if output? do

@@ -21,7 +21,7 @@ defmodule DynamicModuleTest do
       end
 
     DynamicModule.gen(name, preamble, contents, doc: "hello world")
-    {:ok, _pid} = Acme.Server.start_link()
-    assert "hello world" = Acme.Server.hello()
+    {:ok, _pid} = apply(Acme.Server, :start_link, [])
+    assert "hello world" = apply(Acme.Server, :hello, [])
   end
 end
