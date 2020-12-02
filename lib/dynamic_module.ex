@@ -14,7 +14,7 @@ defmodule DynamicModule do
 
     * `:doc` - the documents to the module. Defaults to `false`
     * `:path` - the path for generated `.ex` files. Defaults to `""`
-    * `:ext` - the extension of generated file. Defaults to `ex`
+    * `:type` - the file type of generated file. Could be `:code` or `:test`, Defaults to `:code`
     * `:create` - a boolean value indicates whether to create `.beam` file. Defaults to `true`
   """
   defmacro gen(mod_name, preamble, contents, opts \\ []) do
@@ -27,7 +27,7 @@ defmodule DynamicModule do
       alias Mix.Tasks.Format
       mod_doc = Keyword.get(opts, :doc, false)
       path = Keyword.get(opts, :path, "")
-      ext = Keyword.get(opts, :ext, "ex")
+      type = Keyword.get(opts, :type, :code)
       create? = Keyword.get(opts, :create, true)
       format? = Keyword.get(opts, :format, true)
       output? = Keyword.get(opts, :output, true)
@@ -55,7 +55,11 @@ defmodule DynamicModule do
             |> IO.puts()
 
           :ok ->
-            filename = Path.join(path, "#{mod_name}.#{ext}")
+            filename =
+              case type do
+                :code -> Path.join(path, "#{mod_name}.ex")
+                :test -> Path.join(path, "#{mod_name}_test.exs")
+              end
 
             term =
               if is_list(contents) do
